@@ -1895,29 +1895,28 @@ and smallt.d = '2011-01-04'::date;
 
 explain analyze select smallt.* from smallt, smallt2 where smallt.i = smallt2.i and smallt2.d = '2011-01-04'::date
 and smallt.d = '2011-01-04'::date;
-                                                                              QUERY PLAN                                                                              
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
- Gather Motion 3:1  (slice1; segments: 3)  (cost=796.37..1787.32 rows=4 width=15)
-   Rows out:  20 rows at destination with 0.767 ms to first row, 0.777 ms to end, start offset by 0.527 ms.
-   ->  Nested Loop  (cost=796.37..1787.32 rows=2 width=15)
+                                                                                     QUERY PLAN
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Gather Motion 3:1  (slice1; segments: 3)  (cost=0.00..3997.12 rows=4 width=15)
+   Rows out:  20 rows at destination with 0.350 ms to first row, 0.355 ms to end, start offset by 0.243 ms.
+   ->  Nested Loop  (cost=0.00..3997.12 rows=2 width=15)
          Join Filter: smallt.i = smallt2.i
-         Rows out:  20 rows (seg1) with 0.131 ms to first row, 0.268 ms to end, start offset by 0.898 ms.
-         ->  Index Scan using smallt2_d_idx on smallt2  (cost=0.00..990.51 rows=2 width=4)
+         Rows out:  20 rows (seg1) with 0.022 ms to first row, 0.051 ms to end, start offset by 0.465 ms.
+         ->  Index Scan using smallt2_d_idx on smallt2  (cost=0.00..997.36 rows=2 width=4)
                Index Cond: d = '01-04-2011'::date
-               Rows out:  4 rows (seg1) with 0.018 ms to first row, 0.030 ms to end, start offset by 0.898 ms.
-         ->  Materialize  (cost=796.37..796.42 rows=2 width=15)
-               Rows out:  20 rows (seg1) with 0.108 ms to first row, 0.127 ms to end of 4 scans, start offset by 1.086 ms.
-               ->  Index Scan using smallt_d_idx on smallt  (cost=0.00..796.36 rows=2 width=15)
-                     Index Cond: d = '01-04-2011'::date
-                     Rows out:  5 rows (seg1) with 0.019 ms to first row, 0.029 ms to end, start offset by 0.998 ms.
+               Rows out:  4 rows (seg1) with 0.012 ms to first row, 0.017 ms to end, start offset by 0.465 ms.
+         ->  Index Scan using smallt_d_idx on smallt  (cost=0.00..749.88 rows=2 width=15)
+               Index Cond: smallt.d = '01-04-2011'::date
+               Rows out:  20 rows (seg1) with 0.004 ms to first row, 0.018 ms to end of 4 scans, start offset by 0.518 ms.
  Slice statistics:
-   (slice0)    Executor memory: 163K bytes.
+   (slice0)    Executor memory: 322K bytes.
    (slice1)    Executor memory: 189K bytes avg x 3 workers, 206K bytes max (seg1).
  Statement statistics:
    Memory used: 128000K bytes
- Settings:  enable_bitmapscan=off; enable_hashjoin=off; enable_mergejoin=off; enable_nestloop=on; enable_seqscan=off; gp_enable_agg_distinct=on; optimizer_segments=3
- Total runtime: 1.742 ms
-(20 rows)
+ Settings:  enable_bitmapscan=off; enable_hashjoin=off; enable_mergejoin=off; enable_nestloop=on; enable_seqscan=off; gp_enable_agg_distinct=on; optimizer=off; optimizer_segments=3
+ Optimizer status: legacy query optimizer
+ Total runtime: 0.947 ms
+(19 rows)
 
 -- BitmapScan
 -- start_ignore
@@ -1953,37 +1952,36 @@ and smallt.d = '2011-01-04'::date;
 
 explain analyze select smallt.* from smallt, smallt2 where smallt.i = smallt2.i and smallt2.d = '2011-01-04'::date
 and smallt.d = '2011-01-04'::date;
-                                                                                        QUERY PLAN                                                                                         
--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
- Gather Motion 3:1  (slice1; segments: 3)  (cost=1302.82..1306.34 rows=4 width=15)
-   Rows out:  20 rows at destination with 0.879 ms to first row, 0.890 ms to end, start offset by 0.394 ms.
-   ->  Nested Loop  (cost=1302.82..1306.34 rows=2 width=15)
+                                                                                                QUERY PLAN                                                                                                
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Gather Motion 3:1  (slice1; segments: 3)  (cost=1300.77..2816.49 rows=4 width=15)
+   Rows out:  20 rows at destination with 0.441 ms to first row, 0.448 ms to end, start offset by 0.251 ms.
+   ->  Nested Loop  (cost=1300.77..2816.49 rows=2 width=15)
          Join Filter: smallt.i = smallt2.i
-         Rows out:  20 rows (seg1) with 0.160 ms to first row, 0.287 ms to end, start offset by 0.857 ms.
-         ->  Bitmap Heap Scan on smallt  (cost=500.39..503.45 rows=2 width=15)
+         Rows out:  20 rows (seg1) with 0.052 ms to first row, 0.129 ms to end, start offset by 0.482 ms.
+         ->  Bitmap Heap Scan on smallt2  (cost=800.38..802.43 rows=2 width=4)
                Recheck Cond: d = '01-04-2011'::date
-               Rows out:  5 rows (seg1) with 0.042 ms to first row, 0.050 ms to end, start offset by 0.858 ms.
-               ->  Bitmap Index Scan on smallt_d_idx  (cost=0.00..500.39 rows=2 width=0)
+               Rows out:  4 rows (seg1) with 0.031 ms to first row, 0.036 ms to end, start offset by 0.483 ms.
+               ->  Bitmap Index Scan on smallt2_d_idx  (cost=0.00..800.38 rows=2 width=0)
                      Index Cond: d = '01-04-2011'::date
+                     Bitmaps out:  Avg 1.0 x 3 workers.  Max 1 (seg0) with 0.011 ms to end, start offset by 0.496 ms.
+                     Work_mem used:  9K bytes.
+         ->  Bitmap Heap Scan on smallt  (cost=500.39..503.45 rows=2 width=15)
+               Recheck Cond: smallt.d = '01-04-2011'::date
+               Rows out:  20 rows (seg1) with 0.015 ms to first row, 0.068 ms to end of 4 scans, start offset by 0.602 ms.
+               ->  Bitmap Index Scan on smallt_d_idx  (cost=0.00..500.39 rows=2 width=0)
+                     Index Cond: smallt.d = '01-04-2011'::date
                      Bitmaps out:  Avg 1.0 x 3 workers.  Max 1 (seg0) with 0.017 ms to end, start offset by 0.842 ms.
                      Work_mem used:  9K bytes.
-         ->  Materialize  (cost=802.43..802.47 rows=2 width=4)
-               Rows out:  20 rows (seg1) with 0.114 ms to first row, 0.133 ms to end of 5 scans, start offset by 1.068 ms.
-               ->  Bitmap Heap Scan on smallt2  (cost=800.38..802.43 rows=2 width=4)
-                     Recheck Cond: d = '01-04-2011'::date
-                     Rows out:  4 rows (seg1) with 0.034 ms to first row, 0.045 ms to end, start offset by 0.977 ms.
-                     ->  Bitmap Index Scan on smallt2_d_idx  (cost=0.00..800.38 rows=2 width=0)
-                           Index Cond: d = '01-04-2011'::date
-                           Bitmaps out:  1 (seg1) with 0.013 ms to end, start offset by 0.989 ms.
-                           Work_mem used:  9K bytes.
  Slice statistics:
-   (slice0)    Executor memory: 179K bytes.
+   (slice0)    Executor memory: 402K bytes.
    (slice1)    Executor memory: 387K bytes avg x 3 workers, 495K bytes max (seg1).  Work_mem: 9K bytes max.
  Statement statistics:
    Memory used: 128000K bytes
- Settings:  enable_bitmapscan=on; enable_hashjoin=off; enable_indexscan=off; enable_mergejoin=off; enable_nestloop=on; enable_seqscan=off; gp_enable_agg_distinct=on; optimizer_segments=3
- Total runtime: 1.736 ms
-(28 rows)
+ Settings:  enable_bitmapscan=on; enable_hashjoin=off; enable_indexscan=off; enable_mergejoin=off; enable_nestloop=on; enable_seqscan=off; gp_enable_agg_distinct=on; optimizer=off; optimizer_segments=3
+ Optimizer status: legacy query optimizer
+ Total runtime: 0.981 ms
+(27 rows)
 
 set enable_hashjoin=on;
 set enable_nestloop=off;
